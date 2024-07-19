@@ -30,29 +30,27 @@ pub fn scan_ports(subdomain: String) -> Vec<Port> {
     }
 
     let socket_address = socket_addresses[0];
-    let pool = ThreadPool::new(4); // Create a thread pool with 4 threads
+    let pool = ThreadPool::new(10);
     let (tx, rx) = mpsc::channel();
 
-    // Wrap the port list in Arc
-    let ports = Arc::new(MOST_COMMON_PORTS_100.to_vec()); // Convert to Vec for iteration
 
-    // Create tasks for each port
+    let ports = Arc::new(MOST_COMMON_PORTS_100.to_vec());
+
     for &port in ports.iter() {
         let tx = tx.clone();
         let socket_address = socket_address.clone();
-        let ports = Arc::clone(&ports); // Clone the Arc for each thread
+        // let ports = Arc::clone(&ports);
 
         pool.execute(move || {
-            // Use the Arc in the thread
+
             let result = scan_port(socket_address, port);
             tx.send(result).expect("Failed to send result");
         });
     }
 
-    // Drop the sender to close the channel
     drop(tx);
 
-    // Collect the results
+
     let open_ports: Vec<Port> = rx.iter().filter(|port| port.is_open).collect();
     open_ports
 }
