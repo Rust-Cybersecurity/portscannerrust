@@ -1,13 +1,10 @@
+mod model;
+use crate::model::Port;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::time::Duration;
 use std::sync::{mpsc, Arc};
 use threadpool::ThreadPool;
 
-#[derive(Debug, Clone)]
-pub struct Port {
-    pub port: u16,
-    pub is_open: bool,
-}
 
 pub fn scan_port(socket_address: SocketAddr, port: u16) -> Port {
     let timeout = Duration::from_secs(3);
