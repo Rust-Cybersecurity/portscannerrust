@@ -1,4 +1,6 @@
+mod error;
 mod model;
+
 use crate::model::Port;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::time::Duration;
