@@ -1,6 +1,7 @@
 mod error;
 pub use error::Error;
 mod model;
+mod ports;
 
 use crate::model::Port;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
