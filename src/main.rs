@@ -82,6 +82,11 @@ fn main() -> Result<(), anyhow::Error>{
         .timeout(http_timeout)
         .build()?;
 
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(256)
+        .build()
+        .unwrap();
+
     let subdomain = "gtic.gob.bo".to_string();
     let open_ports = scan_ports(subdomain);
 
