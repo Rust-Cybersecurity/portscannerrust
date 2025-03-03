@@ -3,6 +3,7 @@ pub use error::Error;
 mod model;
 mod ports;
 mod common_ports;
+mod subdomains;
 
 use crate::model::Port;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
@@ -10,7 +11,9 @@ use std::sync::{mpsc, Arc};
 use std::{env, time::Duration};
 use threadpool::ThreadPool;
 use reqwest::{blocking::Client, redirect};
-
+use model::Subdomain;
+use rayon::iter::IntoParallelIterator;
+use rayon::iter::ParallelIterator;
 
 pub fn scan_port(socket_address: SocketAddr, port: u16) -> Port {
     let timeout = Duration::from_secs(3);
@@ -72,10 +75,10 @@ fn main() -> Result<(), anyhow::Error>{
 
     if args.len() != 2 {
         println!("{:?}", args);
-    //    return Err(Error::CliUsage.into());
+        return Err(Error::CliUsage.into());
     }
 
-    //let target = args[1].as_str();
+    let target = args[1].as_str();
     let http_timeout = Duration::from_secs(5);
     let http_client = Client::builder()
         .redirect(redirect::Policy::limited(4))
@@ -87,9 +90,25 @@ fn main() -> Result<(), anyhow::Error>{
         .build()
         .unwrap();
 
-    let subdomain = "gtic.gob.bo".to_string();
-    let open_ports = scan_ports(subdomain);
+    pool.install(|| {
+        let scan_result: Vec<Subdomain> = subdomains::enumerate(&http_client, target)
+            .unwrap()
+            .into_par_iter()
+            .map(ports::scan_ports)
+            .collect();
 
-    println!("Open ports: {:?}", open_ports);
+        for subdomain in scan_result {
+            println!("{}:", &subdomain.domain);
+            for port in &subdomain.open_ports {
+                println!("    {}", port.port);
+            }
+
+            println!();
+        }
+    });
+    //let subdomain = "gtic.gob.bo".to_string();
+    //let open_ports = scan_ports(subdomain);
+
+    //println!("Open ports: {:?}", open_ports);
     Ok(())
 }
