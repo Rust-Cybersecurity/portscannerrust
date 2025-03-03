@@ -2,6 +2,7 @@ mod error;
 pub use error::Error;
 mod model;
 mod ports;
+mod common_ports;
 
 use crate::model::Port;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
@@ -74,7 +75,7 @@ fn main() -> Result<(), anyhow::Error>{
     //    return Err(Error::CliUsage.into());
     }
 
-    let target = args[1].as_str();
+    //let target = args[1].as_str();
     let http_timeout = Duration::from_secs(5);
     let http_client = Client::builder()
         .redirect(redirect::Policy::limited(4))
