@@ -1,11 +1,13 @@
 mod error;
+pub use error::Error;
 mod model;
 
 use crate::model::Port;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
-use std::time::Duration;
 use std::sync::{mpsc, Arc};
+use std::{env, time::Duration};
 use threadpool::ThreadPool;
+use reqwest::{blocking::Client, redirect};
 
 
 pub fn scan_port(socket_address: SocketAddr, port: u16) -> Port {
@@ -63,9 +65,24 @@ const MOST_COMMON_PORTS_100: [u16; 100] = [
     13, 1029, 9, 5051, 6646, 49157, 1028, 873, 1755, 2717, 4899, 9100, 119, 37,
 ];
 
-fn main() {
-    let subdomain = "agetic.gob.bo".to_string();
+fn main() -> Result<(), anyhow::Error>{
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() != 2 {
+        println!("{:?}", args);
+    //    return Err(Error::CliUsage.into());
+    }
+
+    let target = args[1].as_str();
+    let http_timeout = Duration::from_secs(5);
+    let http_client = Client::builder()
+        .redirect(redirect::Policy::limited(4))
+        .timeout(http_timeout)
+        .build()?;
+
+    let subdomain = "gtic.gob.bo".to_string();
     let open_ports = scan_ports(subdomain);
 
     println!("Open ports: {:?}", open_ports);
+    Ok(())
 }
