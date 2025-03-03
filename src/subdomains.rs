@@ -15,7 +15,7 @@ pub fn enumerate(http_client: &Client, target: &str) -> Result<Vec<Subdomain>, E
         .get(&format!("https://crt.sh/?q=%25.{}&output=json", target))
         .send()?
         .json()?;
-
+    //println!("Las entries: {:?}", entries);
     // clean and dedup results
     let mut subdomains: HashSet<String> = entries
         .into_iter()
@@ -30,7 +30,7 @@ pub fn enumerate(http_client: &Client, target: &str) -> Result<Vec<Subdomain>, E
         .filter(|subdomain: &String| !subdomain.contains('*'))
         .collect();
     subdomains.insert(target.to_string());
-
+    //println!("subdomains: {:?}", subdomains);
     let subdomains: Vec<Subdomain> = subdomains
         .into_iter()
         .map(|domain| Subdomain {
@@ -40,6 +40,7 @@ pub fn enumerate(http_client: &Client, target: &str) -> Result<Vec<Subdomain>, E
         .filter(resolves)
         .collect();
 
+    println!("Subdomains: {:?}", subdomains);
     Ok(subdomains)
 }
 

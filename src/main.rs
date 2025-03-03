@@ -5,16 +5,17 @@ mod ports;
 mod common_ports;
 mod subdomains;
 
-use crate::model::Port;
-use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
-use std::sync::{mpsc, Arc};
+// use crate::model::Port;
+// use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
+// use std::sync::{mpsc, Arc};
 use std::{env, time::Duration};
-use threadpool::ThreadPool;
+// use threadpool::ThreadPool;
 use reqwest::{blocking::Client, redirect};
 use model::Subdomain;
 use rayon::iter::IntoParallelIterator;
 use rayon::iter::ParallelIterator;
 
+/*
 pub fn scan_port(socket_address: SocketAddr, port: u16) -> Port {
     let timeout = Duration::from_secs(3);
     let mut address = socket_address;
@@ -60,7 +61,9 @@ pub fn scan_ports(subdomain: String) -> Vec<Port> {
     let open_ports: Vec<Port> = rx.iter().filter(|port| port.is_open).collect();
     open_ports
 }
+*/
 
+/*
 const MOST_COMMON_PORTS_100: [u16; 100] = [
     80, 23, 443, 21, 22, 25, 3389, 110, 445, 139, 143, 53, 135, 3306, 8080, 1723, 111, 995, 993,
     5900, 1025, 587, 8888, 199, 1720, 465, 548, 113, 81, 6001, 10000, 514, 5060, 179, 1026, 2000,
@@ -70,6 +73,7 @@ const MOST_COMMON_PORTS_100: [u16; 100] = [
     13, 1029, 9, 5051, 6646, 49157, 1028, 873, 1755, 2717, 4899, 9100, 119, 37,
 ];
 
+ */
 fn main() -> Result<(), anyhow::Error>{
     let args: Vec<String> = env::args().collect();
 
@@ -79,7 +83,7 @@ fn main() -> Result<(), anyhow::Error>{
     }
 
     let target = args[1].as_str();
-    let http_timeout = Duration::from_secs(5);
+    let http_timeout = Duration::from_secs(30);
     let http_client = Client::builder()
         .redirect(redirect::Policy::limited(4))
         .timeout(http_timeout)
