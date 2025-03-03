@@ -1,2 +1,2 @@
-# portscannerrust
-Port Scanner in Rust
+# Escaner de puertos y subdominios en Rust
+
